@@ -1765,6 +1765,37 @@ export const setVif = (
     rateLimit,
   })
 
+export const addAclRule = ({
+  allow,
+  protocol = undefined,
+  port = undefined,
+  ipRange = undefined,
+  direction,
+  vif,
+}) =>
+  _call('sdnController.addRule', {
+    allow,
+    protocol,
+    port,
+    ipRange,
+    direction,
+    vifId: resolveId(vif),
+  })
+export const deleteAclRule = ({
+  protocol = undefined,
+  port = undefined,
+  ipRange = undefined,
+  direction,
+  vif,
+}) =>
+  _call('sdnController.deleteRule', {
+    protocol,
+    port,
+    ipRange,
+    direction,
+    vifId: resolveId(vif),
+  })
+
 // Network -----------------------------------------------------------
 
 export const editNetwork = (network, props) =>
