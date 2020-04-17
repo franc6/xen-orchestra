@@ -682,7 +682,7 @@ class SDNController extends EventEmitter {
     vifId,
     protocol = undefined,
     port = undefined,
-    ipRange = undefined,
+    ipRange = '',
     direction,
   }) {
     const vif = this._xo.getXapiObject(this._xo.getObject(vifId, 'VIF'))
@@ -723,7 +723,7 @@ class SDNController extends EventEmitter {
     vifId,
     protocol = undefined,
     port = undefined,
-    ipRange = undefined,
+    ipRange = '',
     direction,
   }) {
     const vif = this._xo.getXapiObject(this._xo.getObject(vifId, 'VIF'))
@@ -740,13 +740,13 @@ class SDNController extends EventEmitter {
       return
     }
 
-    const newVifRules = omitBy(JSON.parse(vifRules), vifRule => {
+    const newVifRules = JSON.parse(vifRules).filter(vifRule => {
       const rule = JSON.parse(vifRule)
       return (
-        rule.protocol === protocol &&
-        rule.port === port &&
-        rule.ipRange === ipRange &&
-        rule.direction === direction
+        rule.protocol !== protocol ||
+        rule.port !== port ||
+        rule.ipRange !== ipRange ||
+        rule.direction !== direction
       )
     })
     vif.update_other_config(
