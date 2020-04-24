@@ -1112,7 +1112,7 @@ const messages = {
   addRule: 'Add rule',
   deleteRule: 'Delete rule',
   hideRules: 'Hide rules',
-  noAclRuleReason: 'SDN Controller must be loaded',
+  sdnControllerNotLoaded: 'SDN Controller must be loaded',
   showRules: 'Show rules',
   vifAclRules: 'ACL rules',
   vifCreateDeviceButton: 'New device',
