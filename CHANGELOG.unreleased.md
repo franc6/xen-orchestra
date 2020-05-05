@@ -7,6 +7,8 @@
 
 > Users must be able to say: “Nice enhancement, I'm eager to test it”
 
+- [HOME/ VM] Ability to list VMs which are backed up [#4777](https://github.com/vatesfr/xen-orchestra/issues/4777) (PR [#4974](https://github.com/vatesfr/xen-orchestra/pull/4974))
+
 ### Bug fixes
 
 > Users must be able to say: “I had this issue, happy to know it's fixed”
