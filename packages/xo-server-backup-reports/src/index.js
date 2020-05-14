@@ -1,7 +1,7 @@
 import createLogger from '@xen-orchestra/log'
 import humanFormat from 'human-format'
 import moment from 'moment-timezone'
-import { forEach, groupBy, startCase } from 'lodash'
+import { isEmpty, forEach, groupBy, startCase } from 'lodash'
 import { get } from '@xen-orchestra/defined'
 import pkg from '../package'
 
@@ -667,13 +667,11 @@ class BackupReportsXoPlugin {
     })
   }
 
-  _sendReport({
-    mailReceivers = this._mailsReceivers,
-    markdown,
-    nagiosMarkdown,
-    subject,
-    success,
-  }) {
+  _sendReport({ mailReceivers, markdown, nagiosMarkdown, subject, success }) {
+    if (isEmpty(mailReceivers)) {
+      mailReceivers = this._mailsReceivers
+    }
+
     const xo = this._xo
     return Promise.all([
       xo.sendEmail !== undefined &&
