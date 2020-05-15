@@ -9,6 +9,7 @@ import { readFile } from 'fs'
 
 const DEFAULTS = {
   checkCertificate: true,
+  startTLS: false,
   filter: '(uid={{name}})',
 }
 
@@ -45,6 +46,11 @@ If not specified, it will use a default set of well-known CAs.
       items: {
         type: 'string',
       },
+    },
+    startTLS: {
+      description: 'Use STARTTLS',
+      type: 'boolean',
+      defaults: DEFAULTS.startTLS,
     },
     checkCertificate: {
       description:
@@ -136,12 +142,16 @@ class AuthLdap {
       maxConnections: 5,
       tlsOptions: {},
     })
+    const startTLSOpts = {
+      tlsOptions: {},
+    }
 
     {
       const {
         bind,
         checkCertificate = DEFAULTS.checkCertificate,
         certificateAuthorities,
+        startTLS,
       } = conf
 
       if (bind) {
@@ -149,13 +159,19 @@ class AuthLdap {
         clientOpts.bindCredentials = bind.password
       }
 
-      const { tlsOptions } = clientOpts
+      const { tlsOptions } = startTLS ? startTLSOpts : clientOpts
 
       tlsOptions.rejectUnauthorized = checkCertificate
       if (certificateAuthorities) {
         tlsOptions.ca = await Promise.all(
           certificateAuthorities.map(path => fromCallback(readFile, path))
         )
+      }
+      if (startTLS) {
+        // Must not pass even an empty object if STARTTLS is to be used.
+        // Passing an empty object will cause ldapts to connect as if to an SSL
+        // tunnel.
+        clientOpts.tlsOptions = undefined
       }
     }
 
@@ -168,6 +184,10 @@ class AuthLdap {
     this._credentials = credentials
     this._searchBase = searchBase
     this._searchFilter = searchFilter
+    this._startTLS = {
+      startTLS: conf.startTLS,
+      tlsOptions: startTLSOpts.tlsOptions,
+    }
   }
 
   load() {
@@ -197,6 +217,11 @@ class AuthLdap {
     }
 
     const client = new Client(this._clientOpts)
+
+    if (this._startTLS.startTLS) {
+      logger(`attempting startTLS...`)
+      await client.startTLS(this._startTLS.tlsOptions)
+    }
 
     try {
       // Bind if necessary.
